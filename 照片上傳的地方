@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudinary Image Upload</title>
+</head>
+<body>
+    <h1>上傳圖片到 Cloudinary</h1>
+    <input type="file" id="uploadInput">
+    <button onclick="uploadImage()">上傳圖片</button>
+
+    <script>
+        // Cloudinary 設定
+        const cloudName = "你的cloud_name";  // 替換為你的 Cloudinary Cloud Name
+        const uploadPreset = "my_preset";    // 替換為你創建的上傳預設名稱
+
+        function uploadImage() {
+            const fileInput = document.getElementById('uploadInput');
+            const file = fileInput.files[0];  // 取得用戶選擇的檔案
+
+            if (!file) {
+                alert("請選擇一個檔案！");
+                return;
+            }
+
+            // 建立 FormData 對象，用於上傳圖片
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", uploadPreset);  // 使用上傳預設
+
+            // 發送請求到 Cloudinary API 進行上傳
+            fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())  // 處理回應結果
+            .then(data => {
+                console.log("圖片上傳成功！", data);
+                alert("圖片已成功上傳！");
+                console.log("圖片的 URL:", data.secure_url); // 獲取圖片的 URL
+
+                // 在頁面中顯示上傳的圖片
+                const imgElement = document.createElement('img');
+                imgElement.src = data.secure_url;
+                imgElement.alt = "Uploaded Image";
+                document.body.appendChild(imgElement);
+            })
+            .catch(error => {
+                console.error("圖片上傳失敗：", error);
+                alert("上傳圖片時出現錯誤！");
+            });
+        }
+    </script>
+</body>
+</html>
